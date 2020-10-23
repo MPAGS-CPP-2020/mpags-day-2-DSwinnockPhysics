@@ -5,6 +5,8 @@
 #include "TransformChar.hpp"
 #include "ProcessCommandLine.hpp"
 
+#include <fstream>
+
 // For std::isalpha and std::isupper
 #include <cctype>
 
@@ -14,8 +16,6 @@ int main(int argc, char* argv[])
 {
   // Convert the command-line arguments into a more easily usable form
   const std::vector<std::string> cmdLineArgs {argv, argv+argc};
-
-
 
   // Options that might be set by the command-line arguments
   bool helpRequested {false};
@@ -63,27 +63,53 @@ int main(int argc, char* argv[])
   // Read in user input from stdin/file
   // Warn that input file option not yet implemented
   if (!inputFile.empty()) {
-    std::cout << "[warning] input from file ('"
-              << inputFile
-              << "') not implemented yet, using stdin\n";
+    std::ifstream in_file {inputFile};
+    // Check if file can be read
+    bool ok_to_read_in = in_file.good();
+    if (ok_to_read_in == true) {
+      // Loop over each character from file and transform it
+      // (until Return then CTRL-D (EOF) pressed)
+      while(in_file >> inputChar)
+      {
+        inputText += transformChar ( inputChar );
+      } 
+    }
+    else // Or if the file isn't openable
+    {
+      std::cerr << "Error: File not opened." << std::endl;
+    }
+    
+  }
+  //If there's no input file then use cin
+  else {
+    // Loop over each character from user input
+    // (until Return then CTRL-D (EOF) pressed)
+    while(std::cin >> inputChar)
+    {
+      inputText += transformChar ( inputChar );
+    }
   }
 
-  // Loop over each character from user input
-  // (until Return then CTRL-D (EOF) pressed)
-  while(std::cin >> inputChar)
-  {
-    inputText += transformChar ( inputChar );
-  }
+
 
   // Output the transliterated text
   // Warn that output file option not yet implemented
   if (!outputFile.empty()) {
-    std::cout << "[warning] output to file ('"
-              << outputFile
-              << "') not implemented yet, using stdout\n";
+    std::ofstream out_file {outputFile};
+    // Check if file can be written
+    bool ok_to_write_out = out_file.good();
+    if (ok_to_write_out == true) {  
+      out_file << inputText;
+    }
+    else {
+      std::cerr << "Error: File could not be written." << std::endl;
+    }
+  }
+  // If there's no output file then use cout
+  else{
+    std::cout << inputText << std::endl;
   }
 
-  std::cout << inputText << std::endl;
 
   // No requirement to return from main, but we do so for clarity
   // and for consistency with other functions
