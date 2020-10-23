@@ -77,6 +77,7 @@ int main(int argc, char* argv[])
     else // Or if the file isn't openable
     {
       std::cerr << "Error: File not opened." << std::endl;
+      return 1;
     }
     
   }
@@ -103,6 +104,7 @@ int main(int argc, char* argv[])
     }
     else {
       std::cerr << "Error: File could not be written." << std::endl;
+      return 1;
     }
   }
   // If there's no output file then use cout
