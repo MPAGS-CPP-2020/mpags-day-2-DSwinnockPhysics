@@ -4,6 +4,7 @@
 #include <vector>
 #include "TransformChar.hpp"
 #include "ProcessCommandLine.hpp"
+#include "RunCaesarCipher.hpp"
 
 #include <fstream>
 
@@ -22,8 +23,10 @@ int main(int argc, char* argv[])
   bool versionRequested {false};
   std::string inputFile {""};
   std::string outputFile {""};
+  size_t key{0};
+  bool encrypt{true};  
 
-  if (processCommandLine(cmdLineArgs,helpRequested,versionRequested,inputFile,outputFile) == false) {
+  if (processCommandLine(cmdLineArgs,helpRequested,versionRequested,inputFile,outputFile,key,encrypt) == false) {
     // exit main with non-zero return to indicate failure
     return 1;
   }
@@ -40,7 +43,10 @@ int main(int argc, char* argv[])
     << "  -i FILE          Read text to be processed from FILE\n"
     << "                   Stdin will be used if not supplied\n\n"
     << "  -o FILE          Write processed text to FILE\n"
-    << "                   Stdout will be used if not supplied\n\n";
+    << "                   Stdout will be used if not supplied\n\n"
+    << "  -k KEY           Key for use in encryption/decryption\n"
+    << "                   Should be an integer between 0 and 25\n\n"
+    << "  --encrypt        Bool - true for encrypt, false for decrypt\n\n";
   // Help requires no further action, so return from main
   // with 0 used to indicate success
   return 0;
@@ -91,16 +97,18 @@ int main(int argc, char* argv[])
     }
   }
 
+  // Perform the caesar cipher on the transliterated text
+  std::string outputText{""};
+  outputText = runCaesarCipher(inputText,key,encrypt);
 
-
-  // Output the transliterated text
-  // Warn that output file option not yet implemented
+  // Output the caesar ciphered text
   if (!outputFile.empty()) {
     std::ofstream out_file {outputFile};
     // Check if file can be written
     bool ok_to_write_out = out_file.good();
     if (ok_to_write_out == true) {  
-      out_file << inputText;
+      //out_file << inputText;
+      out_file << outputText;
     }
     else {
       std::cerr << "Error: File could not be written." << std::endl;
@@ -109,7 +117,7 @@ int main(int argc, char* argv[])
   }
   // If there's no output file then use cout
   else{
-    std::cout << inputText << std::endl;
+    std::cout << outputText << std::endl;
   }
 
 
