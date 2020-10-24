@@ -80,9 +80,11 @@ bool processCommandLine(  const std::vector<std::string>& cmdLineArgs,
       else {
         if (cmdLineArgs[i+1] == "true") {
           encrypt = true;
+          ++i;
         }
         else if (cmdLineArgs[i+1] == "false") {
           encrypt = false;
+          ++i;
         }
         else {
           std::cerr << "[error] --encrypt should be followed by true or false" << std::endl;
